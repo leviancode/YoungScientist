@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">YoungScientist</string>
+    <string name="home_title">Молодий вчений</string>
+    <string name="journal_content_description">"Journal #%s"</string>
+</resources>
