@@ -4,54 +4,55 @@ import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.leviancode.youngscientist.R
 import com.leviancode.youngscientist.data.entites.Journal
+import com.leviancode.youngscientist.ui.common.TopBar
 import com.leviancode.youngscientist.utils.years
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel(),
+    navigateToJournalDetail: (journalId: Int) -> Unit
+) {
     val years by viewModel.years.observeAsState(initial = listOf())
     val selectedYear by viewModel.selectedYear.observeAsState(initial = viewModel.currentYear)
     val journals by viewModel.journals.observeAsState(initial = listOf())
 
     Scaffold(
         topBar = {
-            TopBar {
-                Log.i("HomeScreen", "top bar menu click!")
-            }
+            TopBar(
+                title = stringResource(R.string.home_title),
+                navigationIcon = {
+                    Icon(Icons.Filled.Menu, contentDescription = null)
+                },
+                onNavigationIconClick = {
+                    Log.i("HomeScreen", "top bar menu click!")
+                }
+            )
         }
     ) {
         Column {
@@ -59,23 +60,10 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
                 viewModel.loadJournals(selectedYear)
             }
             JournalsGrid(journals = journals) { selectedJournal ->
-
+                navigateToJournalDetail(selectedJournal.number)
             }
         }
     }
-}
-
-@Composable
-fun TopBar(onMenuClick: () -> Unit) {
-    TopAppBar(
-        title = { Text(stringResource(R.string.home_title)) },
-        elevation = 0.dp
-       /* navigationIcon = {
-            IconButton(onClick = { onMenuClick() }) {
-                Icon(Icons.Filled.Menu, contentDescription = null)
-            }
-        }*/
-    )
 }
 
 @Composable
@@ -125,7 +113,7 @@ fun JournalItem(journal: Journal, onItemClick: (Journal) -> Unit) {
         painter = painterResource(R.drawable.cover_test),
         contentDescription = stringResource(
             R.string.journal_content_description,
-            journal.numberTotal
+            journal.number
         )
     )
 }

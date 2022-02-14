@@ -1,50 +1,57 @@
 package com.leviancode.youngscientist.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.leviancode.youngscientist.ui.Navigator.NavTarget
+import androidx.navigation.compose.rememberNavController
 import com.leviancode.youngscientist.ui.screens.detail.DetailScreen
 import com.leviancode.youngscientist.ui.screens.home.HomeScreen
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @Composable
-fun NavigationComponent(navController: NavHostController, navigator: Navigator) {
-    LaunchedEffect("navigation") {
-        navigator.navTargetFlow.onEach {
-            navController.navigate(it.label)
-        }.launchIn(this)
-    }
+fun NavigationComponent() {
+    val navController = rememberNavController()
+    val navigator = remember { Navigator(navController) }
 
     NavHost(
         navController = navController,
-        startDestination = NavTarget.HOME.label
+        startDestination = Screen.Home.route
     ) {
-        composable(NavTarget.HOME.label) {
-            HomeScreen()
+        composable(Screen.Home.route) {
+            HomeScreen { journalId ->
+                navigator.navigateTo(Screen.Detail(journalId))
+            }
         }
-        composable(NavTarget.DETAIL.label) {
-            DetailScreen()
+        composable(Screen.Detail.route) { backStackEntry ->
+            val journalId = backStackEntry.arguments?.getString(Screen.Detail.KEY_ID)
+            requireNotNull(journalId) { "journalId parameter wasn't found. Please make sure it's set!" }
+            DetailScreen(journalId.toInt()){
+                navigator.navigateBack()
+            }
         }
     }
 }
 
-class Navigator {
-    private val _navTargetFlow = MutableSharedFlow<NavTarget>(extraBufferCapacity = 1)
-    val navTargetFlow = _navTargetFlow.asSharedFlow()
+class Navigator(private val navController: NavHostController) {
 
-    fun navigateTo(navTarget: NavTarget) {
-        _navTargetFlow.tryEmit(navTarget)
+    fun navigateTo(navTarget: Screen) {
+        navController.navigate(navTarget.route)
     }
 
-    enum class NavTarget(val label: String) {
-        HOME("home"),
-        DETAIL("detail")
+    fun navigateBack() {
+        navController.popBackStack()
+    }
+}
+
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    class Detail(journalId: Int) : Screen("detail/$journalId") {
+
+        companion object {
+            const val KEY_ID = "journalId"
+            const val route = "detail/{$KEY_ID}"
+        }
     }
 }
 

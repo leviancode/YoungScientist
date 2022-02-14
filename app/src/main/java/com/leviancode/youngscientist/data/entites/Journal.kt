@@ -1,10 +1,9 @@
 package com.leviancode.youngscientist.data.entites
 
 data class Journal(
-    val id: String,
-    val year: Int,
+    val number: Int,
     val numberInYear: Int,
-    val numberTotal: Int,
+    val year: Int,
     val cover: String,
     val coverDescription: String,
     val articles: List<Article>
