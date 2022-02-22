@@ -14,5 +14,3 @@ val years = listOf(
 
 const val ITEMS_IN_ROW = 3
 const val ROWS_ON_PAGE = 4
-
-const val BASE_URL = "https://molodyivchenyi.ua/index.php/journal/issue/archive"
