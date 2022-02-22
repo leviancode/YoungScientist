@@ -5,5 +5,6 @@ data class Article(
     val author: String,
     val summary: String,
     val content: String,
+    val section: String,
     val references: String
 )

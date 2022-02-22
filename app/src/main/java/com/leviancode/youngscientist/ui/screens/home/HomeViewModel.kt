@@ -25,7 +25,7 @@ class HomeViewModel @Inject constructor(private val repository: JournalsReposito
     val currentYear get() = Calendar.getInstance().get(Calendar.YEAR)
 
     init {
-        loadJournals(2021)
+        loadJournals(currentYear - 1)
     }
 
     fun loadJournals(year: Int) {
