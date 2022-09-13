@@ -43,10 +43,9 @@ fun DetailScreen(
                 }
             )
         }
-    ) {
+    ) { padding ->
         Column(
-            modifier = Modifier
-                .padding(16.dp)
+            modifier = Modifier.padding(padding)
         ) {
             Row {
                 Image(

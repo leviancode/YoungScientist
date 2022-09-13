@@ -1,7 +1,6 @@
 package com.leviancode.youngscientist.ui.screens.home
 
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -10,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScrollableTabRow
@@ -26,14 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
-import coil.transform.CircleCropTransformation
 import com.leviancode.youngscientist.R
 import com.leviancode.youngscientist.data.entites.Journal
 import com.leviancode.youngscientist.ui.common.TopBar
@@ -59,17 +56,17 @@ fun HomeScreen(
                     Log.i("HomeScreen", "top bar menu click!")
                 }
             )
-        }
-    ) {
-        Column {
-            YearsTabs(years = years, selectedYear) { selectedYear ->
-                viewModel.loadJournals(selectedYear)
+        },
+        content = { padding ->
+            Column(modifier = Modifier.padding(padding)) {
+                YearsTabs(years = years, selectedYear) { selectedYear ->
+                    viewModel.loadJournals(selectedYear)
+                }
+                JournalsGrid(journals = journals) { selectedJournal ->
+                    navigateToJournalDetail(selectedJournal.number)
+                }
             }
-            JournalsGrid(journals = journals) { selectedJournal ->
-                navigateToJournalDetail(selectedJournal.number)
-            }
-        }
-    }
+        })
 }
 
 @Composable
@@ -89,14 +86,13 @@ fun YearsTabs(years: List<Int>, selectedYear: Int, onTabClick: (year: Int) -> Un
         })
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun JournalsGrid(journals: List<Journal>, onJournalClick: (Journal) -> Unit) {
     LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
-        cells = GridCells.Fixed(3),
         contentPadding = PaddingValues(
             start = dimensionResource(R.dimen.grid_item_padding),
             top = dimensionResource(R.dimen.grid_item_padding),
@@ -115,7 +111,7 @@ fun JournalItem(journal: Journal, onItemClick: (Journal) -> Unit) {
     Column(
         modifier = Modifier
             .clickable { onItemClick(journal) },
-         horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             modifier = Modifier
